@@ -1,0 +1,66 @@
+.header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logoCircle {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+    border: 2px solid var(--accent-color);
+}
+
+.titles {
+    display: flex;
+    flex-direction: column;
+}
+
+.mainTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: white;
+}
+
+.subTitle {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+@media (max-width: 600px) {
+    .mainTitle {
+        font-size: 1rem;
+    }
+
+    .subTitle {
+        font-size: 0.75rem;
+    }
+
+    .logoCircle {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
