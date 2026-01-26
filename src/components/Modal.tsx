@@ -6,9 +6,10 @@ interface Props {
     message: string;
     onConfirm: () => void;
     onCancel: () => void;
+    isLoading?: boolean;
 }
 
-export default function Modal({ isOpen, title, message, onConfirm, onCancel }: Props) {
+export default function Modal({ isOpen, title, message, onConfirm, onCancel, isLoading = false }: Props) {
     if (!isOpen) return null;
 
     return (
@@ -17,11 +18,19 @@ export default function Modal({ isOpen, title, message, onConfirm, onCancel }: P
                 <h3 className={styles.title}>{title}</h3>
                 <p className={styles.content}>{message}</p>
                 <div className={styles.actions}>
-                    <button className={styles.cancelBtn} onClick={onCancel}>
+                    <button 
+                        className={styles.cancelBtn} 
+                        onClick={onCancel}
+                        disabled={isLoading}
+                    >
                         Cancel
                     </button>
-                    <button className={styles.confirmBtn} onClick={onConfirm}>
-                        Confirm Vote
+                    <button 
+                        className={styles.confirmBtn} 
+                        onClick={onConfirm}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Submitting...' : 'Confirm Vote'}
                     </button>
                 </div>
             </div>
