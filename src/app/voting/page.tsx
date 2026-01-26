@@ -68,7 +68,7 @@ export default function VotingPage() {
             <Modal
                 isOpen={isModalOpen}
                 title="Confirm Submission"
-                message="Are you sure you want to submit your vote? Detailed summary will be shown next."
+                message="Are you sure you want to submit your vote? Once your vote is recorded, you are not allowed to vote again."
                 onConfirm={handleConfirmVote}
                 onCancel={() => setIsModalOpen(false)}
             />
