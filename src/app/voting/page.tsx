@@ -140,7 +140,7 @@ export default function VotingPage() {
     // Show loading state while checking authentication or loading posts
     if (!isAuthenticated || isLoadingPosts) {
         return (
-            <div className="container" style={{ textAlign: 'center', padding: '2rem' }}>
+            <div className="container alert-info">
                 <p>Loading voting data...</p>
             </div>
         );
@@ -148,31 +148,18 @@ export default function VotingPage() {
 
     return (
         <div className="container">
-            <h1 style={{ margin: '2rem 0', textAlign: 'center', borderBottom: '1px solid #ddd', paddingBottom: '1rem' }}>
+            <h1 className="ballot-title">
                 SGEA Election 2024 Ballot
             </h1>
 
             {error && (
-                <div style={{
-                    padding: '1rem',
-                    margin: '1rem 0',
-                    backgroundColor: '#fee',
-                    color: '#c33',
-                    borderRadius: '4px',
-                    border: '1px solid #fcc',
-                    fontSize: '0.9rem',
-                    textAlign: 'center'
-                }}>
+                <div className="alert-error">
                     {error}
                 </div>
             )}
 
             {posts.length === 0 ? (
-                <div style={{
-                    padding: '2rem',
-                    textAlign: 'center',
-                    color: '#666'
-                }}>
+                <div className="alert-info">
                     <p>No active posts available for voting.</p>
                 </div>
             ) : (
@@ -186,15 +173,13 @@ export default function VotingPage() {
                 ))
             )}
 
-            <div style={{ padding: '2rem 0', textAlign: 'center' }}>
+            <div className="submit-section">
                 <button
                     onClick={handleInitialSubmit}
                     className="primary-btn"
                     disabled={isSubmitting || !isFormComplete}
                     style={{
-                        fontSize: '1.2rem',
-                        padding: '1rem 3rem',
-                        opacity: isFormComplete && !isSubmitting ? 1 : 0.5,
+                        opacity: isFormComplete && !isSubmitting ? 1 : 0.6,
                         cursor: isFormComplete && !isSubmitting ? 'pointer' : 'not-allowed'
                     }}
                 >

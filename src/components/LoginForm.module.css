@@ -1,35 +1,62 @@
+/* Login card - mobile first */
 .card {
     background: var(--card-bg);
-    padding: 2.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
+    border: 1px solid var(--border-color);
     border-top: 4px solid var(--primary-color);
+}
+
+@media (min-width: 600px) {
+    .card {
+        padding: 2.25rem 2rem;
+    }
 }
 
 .title {
     text-align: center;
     color: var(--primary-color);
-    margin-bottom: 2rem;
-    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    word-wrap: break-word;
+}
+
+@media (min-width: 600px) {
+    .title {
+        margin-bottom: 1.5rem;
+        font-size: 1.375rem;
+    }
 }
 
 .instructions {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     color: var(--text-secondary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
     text-align: center;
     background-color: #f0f9ff;
-    padding: 0.75rem;
-    border-radius: 4px;
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--radius);
     border: 1px solid #bae6fd;
+    word-wrap: break-word;
+}
+
+@media (min-width: 600px) {
+    .instructions {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        padding: 0.75rem 1rem;
+    }
 }
 
 .submitBtn {
     width: 100%;
     padding: 0.875rem;
+    min-height: var(--touch-min);
     font-size: 1rem;
     margin-top: 1rem;
 }
@@ -42,11 +69,13 @@
 
 .eyeButton {
     position: absolute;
-    right: 12px;
+    right: 10px;
     background: none;
     border: none;
     cursor: pointer;
-    padding: 4px;
+    padding: 8px;
+    min-width: var(--touch-min);
+    min-height: var(--touch-min);
     display: flex;
     align-items: center;
     justify-content: center;

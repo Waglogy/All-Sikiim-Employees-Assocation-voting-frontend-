@@ -1,29 +1,55 @@
+/* Post section - mobile first */
 .section {
-    margin-bottom: 3rem;
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
+    margin-bottom: 1.75rem;
+    background: var(--card-bg);
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 600px) {
+    .section {
+        margin-bottom: 2.5rem;
+        padding: 1.5rem 1.75rem;
+    }
 }
 
 .title {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid var(--accent-color);
     display: inline-block;
     color: var(--primary-color);
+    font-size: 1rem;
+    font-weight: 600;
+    word-wrap: break-word;
+    max-width: 100%;
 }
 
+@media (min-width: 600px) {
+    .title {
+        margin-bottom: 1.25rem;
+        font-size: 1.125rem;
+    }
+}
+
+/* Mobile first: 2 cols on small screens, auto-fit on larger */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
 }
 
-@media (max-width: 600px) {
+@media (min-width: 360px) {
     .grid {
-        grid-template-columns: repeat(2, 1fr);
-        /* 2 columns on mobile */
         gap: 1rem;
+    }
+}
+
+@media (min-width: 600px) {
+    .grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
     }
 }

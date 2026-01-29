@@ -1,60 +1,130 @@
+/* Modal - mobile first, safe area */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(15, 23, 42, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     animation: fadeIn 0.2s ease-out;
+    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 8px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    background-color: var(--card-bg);
+    padding: 1.25rem 1.25rem;
+    border-radius: var(--radius-lg);
+    max-width: 480px;
+    width: 100%;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    box-shadow: var(--shadow-md), 0 20px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
     animation: slideIn 0.2s ease-out;
+    margin: auto;
+}
+
+@media (min-width: 600px) {
+    .modal {
+        padding: 1.75rem 2rem;
+        width: 90%;
+    }
 }
 
 .title {
     color: var(--primary-color);
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    word-wrap: break-word;
+}
+
+@media (min-width: 600px) {
+    .title {
+        font-size: 1.125rem;
+    }
 }
 
 .content {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     color: var(--text-secondary);
     line-height: 1.6;
+    font-size: 0.875rem;
+    word-wrap: break-word;
 }
 
+@media (min-width: 600px) {
+    .content {
+        margin-bottom: 1.5rem;
+        font-size: 0.9375rem;
+    }
+}
+
+/* Mobile: stack full-width buttons; desktop: row */
 .actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+}
+
+@media (min-width: 600px) {
+    .actions {
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
 }
 
 .cancelBtn {
     background: none;
     border: 1px solid var(--border-color);
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
+    padding: 0.75rem 1.25rem;
+    min-height: var(--touch-min);
+    border-radius: var(--radius);
     color: var(--text-secondary);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    width: 100%;
+}
+
+@media (min-width: 600px) {
+    .cancelBtn {
+        width: auto;
+        padding: 0.625rem 1.25rem;
+    }
+}
+
+.cancelBtn:hover {
+    background-color: var(--bg-color);
 }
 
 .confirmBtn {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
+    padding: 0.75rem 1.25rem;
+    min-height: var(--touch-min);
+    border-radius: var(--radius);
     font-weight: 600;
+    font-size: 0.9375rem;
+    width: 100%;
+}
+
+@media (min-width: 600px) {
+    .confirmBtn {
+        width: auto;
+        padding: 0.625rem 1.25rem;
+    }
+}
+
+.confirmBtn:hover:not(:disabled) {
+    background-color: var(--primary-hover);
 }
 
 @keyframes fadeIn {

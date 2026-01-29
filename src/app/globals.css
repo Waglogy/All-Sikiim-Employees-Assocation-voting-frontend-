@@ -1,15 +1,25 @@
 :root {
   --primary-color: #1a4f8b; /* Formal Govt Blue */
-  --primary-hover: #133a68;
-  --accent-color: #f59e0b; /* Subtle Saffron/Orange */
-  --bg-color: #f3f4f6;
+  --primary-hover: #0f3a6b;
+  --accent-color: #c2410c; /* Govt-style accent */
+  --bg-color: #f8fafc;
   --card-bg: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --border-color: #e5e7eb;
-  --success: #10b981;
-  --error: #ef4444;
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: #e2e8f0;
+  --success: #0d9488;
+  --error: #b91c1c;
+  --font-family: var(--font-source-sans), 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --radius: 6px;
+  --radius-lg: 8px;
+  /* Mobile-first breakpoints */
+  --touch-min: 44px; /* min touch target */
+  --bp-sm: 360px;
+  --bp-md: 600px;
+  --bp-lg: 768px;
+  --bp-xl: 1024px;
 }
 
 * {
@@ -18,14 +28,22 @@
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--bg-color);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: 1.6;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 a {
@@ -38,38 +56,72 @@ button {
   font-family: inherit;
 }
 
-/* Formal Container */
+/* Formal Container - mobile first, safe area aware */
 .container {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
 }
 
-/* Typography Headings */
+@media (min-width: 768px) {
+  .container {
+    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(1.5rem, env(safe-area-inset-right));
+  }
+}
+
+/* Typography Headings - mobile first */
 h1, h2, h3, h4, h5, h6 {
   color: var(--primary-color);
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+  word-wrap: break-word;
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.0625rem; }
 
-/* Utility Classes */
+@media (min-width: 600px) {
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.375rem; }
+  h3 { font-size: 1.125rem; }
+}
+
+/* Utility Classes - touch-friendly on mobile */
 .primary-btn {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  min-height: var(--touch-min);
+  border-radius: var(--radius);
   font-weight: 600;
-  transition: background-color 0.2s;
+  font-size: 0.9375rem;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.primary-btn:hover {
+@media (min-width: 600px) {
+  .primary-btn {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+.primary-btn:hover:not(:disabled) {
   background-color: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.primary-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .form-group {
@@ -85,15 +137,139 @@ h3 { font-size: 1.25rem; }
 
 .form-input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  min-height: var(--touch-min);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  border-radius: var(--radius);
+  font-size: 16px; /* prevents zoom on focus on iOS */
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--card-bg);
 }
 
 .form-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(26, 79, 139, 0.1);
+  box-shadow: 0 0 0 3px rgba(26, 79, 139, 0.12);
+}
+
+.form-input:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Layout - mobile first */
+.main-content {
+  flex: 1;
+  padding: 1.25rem 0;
+}
+
+@media (min-width: 600px) {
+  .main-content {
+    padding: 2rem 0;
+  }
+}
+
+/* Voting page */
+.ballot-title {
+  margin: 1.25rem 0 1rem;
+  text-align: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  word-wrap: break-word;
+}
+
+@media (min-width: 600px) {
+  .ballot-title {
+    margin: 2rem 0;
+    padding-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+}
+
+.alert-error {
+  padding: 0.875rem 1rem;
+  margin: 0.75rem 0;
+  background-color: #fef2f2;
+  color: var(--error);
+  border-radius: var(--radius);
+  border: 1px solid #fecaca;
+  font-size: 0.875rem;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+@media (min-width: 600px) {
+  .alert-error {
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+}
+
+.alert-success {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background-color: #f0fdf4;
+  color: var(--success);
+  border-radius: var(--radius);
+  border: 1px solid #bbf7d0;
+  font-size: 0.9rem;
+}
+
+.alert-info {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+}
+
+@media (min-width: 600px) {
+  .alert-info {
+    padding: 2rem;
+  }
+}
+
+.submit-section {
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+@media (min-width: 600px) {
+  .submit-section {
+    padding: 2rem 0;
+  }
+}
+
+/* Full-width primary button on mobile for easier tap */
+.submit-section .primary-btn {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 600px) {
+  .submit-section .primary-btn {
+    width: auto;
+    max-width: none;
+  }
+}
+
+/* Home / Login wrapper - mobile first */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  min-height: 60dvh;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+@media (min-width: 600px) {
+  .login-wrapper {
+    min-height: 60vh;
+    padding: 2rem 0;
+  }
 }

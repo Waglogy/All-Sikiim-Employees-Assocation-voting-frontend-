@@ -112,29 +112,13 @@ export default function LoginForm() {
             </div>
 
             {error && (
-                <div style={{
-                    padding: '0.75rem',
-                    marginBottom: '1rem',
-                    backgroundColor: '#fee',
-                    color: '#c33',
-                    borderRadius: '4px',
-                    border: '1px solid #fcc',
-                    fontSize: '0.9rem'
-                }}>
+                <div className="alert-error" style={{ marginBottom: '1rem' }}>
                     {error}
                 </div>
             )}
 
             {successMessage && (
-                <div style={{
-                    padding: '0.75rem',
-                    marginBottom: '1rem',
-                    backgroundColor: '#efe',
-                    color: '#3c3',
-                    borderRadius: '4px',
-                    border: '1px solid #cfc',
-                    fontSize: '0.9rem'
-                }}>
+                <div className="alert-success">
                     {successMessage}
                 </div>
             )}
@@ -176,7 +160,7 @@ export default function LoginForm() {
                             className="form-input"
                             value={phoneNumber}
                             disabled
-                            style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                            style={{ backgroundColor: 'var(--bg-color)', cursor: 'not-allowed' }}
                         />
                     </div>
                     <div className="form-group">

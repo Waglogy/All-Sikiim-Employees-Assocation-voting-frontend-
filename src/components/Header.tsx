@@ -7,7 +7,7 @@ export default function Header() {
                 <div className={styles.logoSection}>
                     <div className={styles.logoCircle}>AS</div>
                     <div className={styles.titles}>
-                        <h1 className={styles.mainTitle}>All Sikkim Govt. Employees Association</h1>
+                        <h1 className={styles.mainTitle}>All Sikkim Govt. Employees Association ( C & D Category)</h1>
                         <span className={styles.subTitle}>Group C & D Voting Platform</span>
                     </div>
                 </div>

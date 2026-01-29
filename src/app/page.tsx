@@ -1,9 +1,9 @@
-import LoginForm from "@/components/LoginForm";
+import LoginPageContent from "@/components/LoginPageContent";
 
 export default function Home() {
   return (
-    <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-      <LoginForm />
+    <div className="container login-wrapper">
+      <LoginPageContent />
     </div>
   );
 }

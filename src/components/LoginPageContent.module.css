@@ -1,0 +1,45 @@
+/* Login page content - mobile first */
+.wrapper {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.howToVoteSection {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+@media (min-width: 600px) {
+    .howToVoteSection {
+        margin-top: 2rem;
+    }
+}
+
+.howToVoteBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--touch-min);
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    width: 100%;
+    max-width: 280px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.howToVoteBtn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.howToVoteBtn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
