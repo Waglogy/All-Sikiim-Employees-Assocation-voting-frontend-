@@ -14,6 +14,10 @@ const sourceSans = Source_Sans_3({
 export const metadata: Metadata = {
   title: 'ASGEA Voting Platform',
   description: 'Official Voting Platform for Sikkim Government Employees Association ( C & D Category)',
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export const viewport = {
@@ -30,7 +34,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={sourceSans.variable}>
-      <body>
+      <body suppressHydrationWarning>
         <Header />
         <main className="main-content">{children}</main>
         <Footer />

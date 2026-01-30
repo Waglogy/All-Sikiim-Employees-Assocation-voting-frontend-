@@ -1,9 +1,9 @@
-import LoginPageContent from "@/components/LoginPageContent";
+import LandingPage from "@/components/LandingPage";
 
 export default function Home() {
   return (
-    <div className="container login-wrapper">
-      <LoginPageContent />
+    <div className="container">
+      <LandingPage />
     </div>
   );
 }
