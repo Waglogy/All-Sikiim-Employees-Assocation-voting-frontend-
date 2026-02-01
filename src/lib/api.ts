@@ -1,5 +1,35 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+/** User-friendly message when fetch fails (no connection, CORS, server down, etc.) */
+function getNetworkErrorMessage(error: unknown): string {
+  const defaultMsg = 'Unable to connect. Please check your internet connection and try again.';
+  if (error instanceof Error) {
+    const msg = error.message?.trim();
+    if (!msg) return defaultMsg;
+    if (/failed to fetch|load failed|networkerror|network request failed/i.test(msg)) return defaultMsg;
+    return msg;
+  }
+  if (error && typeof error === 'object' && 'message' in error && typeof (error as { message: unknown }).message === 'string') {
+    const msg = String((error as { message: string }).message).trim();
+    if (msg) return msg;
+  }
+  return defaultMsg;
+}
+
+/** Parse response as JSON; throw a clear error if server returned HTML or invalid JSON */
+async function parseJsonResponse(response: Response): Promise<unknown> {
+  const text = await response.text();
+  const trimmed = text.trim();
+  if (trimmed.startsWith('<') || trimmed.startsWith('<!')) {
+    throw new Error('Server returned an unexpected response. Please try again later.');
+  }
+  try {
+    return trimmed ? JSON.parse(text) : {};
+  } catch {
+    throw new Error('Server returned an unexpected response. Please try again later.');
+  }
+}
+
 export interface ApiError {
   message: string;
   status?: number;
@@ -81,9 +111,9 @@ export async function checkHealth(): Promise<HealthResponse> {
       throw new Error(`Health check failed: ${response.statusText}`);
     }
 
-    return await response.json();
+    return (await parseJsonResponse(response)) as HealthResponse;
   } catch (error) {
-    throw new Error(`Failed to connect to backend: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(getNetworkErrorMessage(error));
   }
 }
 
@@ -100,10 +130,10 @@ export async function sendOtp(phone: string): Promise<SendOtpResponse> {
       body: JSON.stringify({ phone }),
     });
 
-    const data = await response.json();
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
 
     if (!response.ok) {
-      const errorMessage = data.message || data.error || `Failed to send OTP: ${response.statusText}`;
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to send OTP: ${response.statusText}`;
       const apiError: ApiError = {
         message: errorMessage,
         status: response.status,
@@ -116,18 +146,18 @@ export async function sendOtp(phone: string): Promise<SendOtpResponse> {
         apiError.message = 'You have already voted. Cannot request OTP again.';
         apiError.code = 'ALREADY_VOTED';
       } else if (response.status === 400) {
-        apiError.message = data.message || 'Invalid phone number format.';
+        apiError.message = (data.message as string) || 'Invalid phone number format.';
       }
 
       throw apiError;
     }
 
-    return data;
+    return data as unknown as SendOtpResponse;
   } catch (error) {
-    if (error instanceof Error && 'status' in error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
       throw error;
     }
-    throw new Error(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(getNetworkErrorMessage(error));
   }
 }
 
@@ -144,10 +174,10 @@ export async function verifyOtp(phone: string, otp: string): Promise<VerifyOtpRe
       body: JSON.stringify({ phone, otp }),
     });
 
-    const data = await response.json();
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
 
     if (!response.ok) {
-      const errorMessage = data.message || data.error || `Failed to verify OTP: ${response.statusText}`;
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to verify OTP: ${response.statusText}`;
       const apiError: ApiError = {
         message: errorMessage,
         status: response.status,
@@ -158,12 +188,13 @@ export async function verifyOtp(phone: string, otp: string): Promise<VerifyOtpRe
         apiError.message = 'Invalid OTP. Please check and try again.';
         apiError.code = 'INVALID_OTP';
       } else if (response.status === 403) {
-        apiError.message = 'You have already voted. Cannot login again.';
+        apiError.message = (data.message as string) || 'You have already voted. Cannot login again.';
         apiError.code = 'ALREADY_VOTED';
       } else if (response.status === 400) {
-        apiError.message = data.message || 'Invalid request. Please check your input.';
+        apiError.message = (data.message as string) || 'Invalid or expired OTP. Please check and try again.';
+        apiError.code = 'INVALID_OTP';
       } else if (response.status === 404) {
-        apiError.message = 'Phone number not found.';
+        apiError.message = (data.message as string) || 'Voter not found.';
       }
 
       throw apiError;
@@ -173,12 +204,12 @@ export async function verifyOtp(phone: string, otp: string): Promise<VerifyOtpRe
       throw new Error('No token received from server');
     }
 
-    return data;
+    return data as unknown as VerifyOtpResponse;
   } catch (error) {
-    if (error instanceof Error && 'status' in error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
       throw error;
     }
-    throw new Error(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(getNetworkErrorMessage(error));
   }
 }
 
@@ -196,10 +227,10 @@ export async function castVote(token: string, votes: CastVoteRequest['votes']): 
       body: JSON.stringify({ votes }),
     });
 
-    const data = await response.json();
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
 
     if (!response.ok) {
-      const errorMessage = data.message || data.error || `Failed to cast vote: ${response.statusText}`;
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to cast vote: ${response.statusText}`;
       const apiError: ApiError = {
         message: errorMessage,
         status: response.status,
@@ -213,9 +244,9 @@ export async function castVote(token: string, votes: CastVoteRequest['votes']): 
         apiError.message = 'You have already voted for one or more posts.';
         apiError.code = 'ALREADY_VOTED';
       } else if (response.status === 400) {
-        apiError.message = data.message || 'Invalid vote data. Please check your selections.';
+        apiError.message = (data.message as string) || 'Invalid vote data. Please check your selections.';
       } else if (response.status === 404) {
-        apiError.message = data.message || 'Post or candidate not found.';
+        apiError.message = (data.message as string) || 'Post or candidate not found.';
       }
 
       // Include failed votes if present
@@ -226,12 +257,12 @@ export async function castVote(token: string, votes: CastVoteRequest['votes']): 
       throw apiError;
     }
 
-    return data;
+    return data as unknown as CastVoteResponse;
   } catch (error) {
-    if (error instanceof Error && 'status' in error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
       throw error;
     }
-    throw new Error(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(getNetworkErrorMessage(error));
   }
 }
 
@@ -247,10 +278,10 @@ export async function getAllPosts(): Promise<GetAllPostsResponse> {
       },
     });
 
-    const data = await response.json();
+    const data = (await parseJsonResponse(response)) as GetAllPostsResponse & { message?: string; error?: string };
 
     if (!response.ok) {
-      const errorMessage = data.message || data.error || `Failed to fetch posts: ${response.statusText}`;
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch posts: ${response.statusText}`;
       const apiError: ApiError = {
         message: errorMessage,
         status: response.status,
@@ -259,12 +290,12 @@ export async function getAllPosts(): Promise<GetAllPostsResponse> {
       throw apiError;
     }
 
-    return data;
+    return data as GetAllPostsResponse;
   } catch (error) {
-    if (error instanceof Error && 'status' in error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
       throw error;
     }
-    throw new Error(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(getNetworkErrorMessage(error));
   }
 }
 
@@ -280,10 +311,10 @@ export async function getPostsWithCandidates(): Promise<GetPostsWithCandidatesRe
       },
     });
 
-    const data = await response.json();
+    const data = (await parseJsonResponse(response)) as GetPostsWithCandidatesResponse & { message?: string; error?: string };
 
     if (!response.ok) {
-      const errorMessage = data.message || data.error || `Failed to fetch posts with candidates: ${response.statusText}`;
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch posts with candidates: ${response.statusText}`;
       const apiError: ApiError = {
         message: errorMessage,
         status: response.status,
@@ -292,12 +323,12 @@ export async function getPostsWithCandidates(): Promise<GetPostsWithCandidatesRe
       throw apiError;
     }
 
-    return data;
+    return data as GetPostsWithCandidatesResponse;
   } catch (error) {
-    if (error instanceof Error && 'status' in error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
       throw error;
     }
-    throw new Error(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(getNetworkErrorMessage(error));
   }
 }
 
@@ -313,10 +344,10 @@ export async function getCandidatesByPost(postId: number): Promise<GetCandidates
       },
     });
 
-    const data = await response.json();
+    const data = (await parseJsonResponse(response)) as GetCandidatesByPostResponse & { message?: string; error?: string };
 
     if (!response.ok) {
-      const errorMessage = data.message || data.error || `Failed to fetch candidates: ${response.statusText}`;
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch candidates: ${response.statusText}`;
       const apiError: ApiError = {
         message: errorMessage,
         status: response.status,
@@ -329,11 +360,11 @@ export async function getCandidatesByPost(postId: number): Promise<GetCandidates
       throw apiError;
     }
 
-    return data;
+    return data as GetCandidatesByPostResponse;
   } catch (error) {
-    if (error instanceof Error && 'status' in error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
       throw error;
     }
-    throw new Error(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(getNetworkErrorMessage(error));
   }
 }
