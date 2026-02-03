@@ -129,6 +129,14 @@
   margin-bottom: 0;
 }
 
+.buttonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+}
+
 .howToVoteBtn {
   display: inline-flex;
   align-items: center;
@@ -142,7 +150,8 @@
   font-weight: 600;
   font-size: 0.9375rem;
   cursor: pointer;
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
   max-width: 320px;
   transition: background-color 0.2s, color 0.2s;
 }
@@ -153,6 +162,37 @@
 }
 
 .howToVoteBtn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.loginBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-min);
+  padding: 0.75rem 1.25rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: 2px solid var(--primary-color);
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 320px;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.loginBtn:hover {
+  background-color: var(--primary-hover);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.loginBtn:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }

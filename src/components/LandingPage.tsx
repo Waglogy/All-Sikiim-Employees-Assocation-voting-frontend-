@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import HowToVoteModal from './HowToVoteModal';
 import styles from './LandingPage.module.css';
 
@@ -41,14 +42,23 @@ export default function LandingPage() {
           <p className={styles.sectionText}>
             When voting opens, you will log in with your phone number, receive an OTP, select your preferred candidate for each post, and submit your vote. Full step-by-step instructions are available below.
           </p>
-          <button
-            type="button"
-            className={styles.howToVoteBtn}
-            onClick={() => setIsHowToVoteOpen(true)}
-            aria-label="Open how to vote instructions"
-          >
-            See How to Vote (English / नेपाली)
-          </button>
+          <div className={styles.buttonRow}>
+            <button
+              type="button"
+              className={styles.howToVoteBtn}
+              onClick={() => setIsHowToVoteOpen(true)}
+              aria-label="Open how to vote instructions"
+            >
+              See How to Vote (English / नेपाली)
+            </button>
+            <Link
+              href="/login"
+              className={styles.loginBtn}
+              aria-label="Go to login page"
+            >
+              Login
+            </Link>
+          </div>
         </section>
       </div>
 
