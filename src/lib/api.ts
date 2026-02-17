@@ -95,6 +95,31 @@ export interface GetCandidatesByPostResponse {
   candidates: Candidate[];
 }
 
+export interface ResultCandidate {
+  id: number;
+  name: string;
+  votes: number;
+  percentage: number;
+}
+
+export interface PostResult {
+  post_id: number;
+  post_title: string;
+  total_votes: number;
+  candidates: ResultCandidate[];
+}
+
+export interface ResultsSummary {
+  total_posts: number;
+  total_votes: number;
+  total_voters: number;
+}
+
+export interface GetResultsResponse {
+  results: PostResult[];
+  summary: ResultsSummary;
+}
+
 /**
  * Check if the backend is running
  */
@@ -361,6 +386,45 @@ export async function getCandidatesByPost(postId: number): Promise<GetCandidates
     }
 
     return data as GetCandidatesByPostResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/**
+ * Get election results (requires password)
+ */
+export async function getResults(password: string): Promise<GetResultsResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/results`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Results-Password': password,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as GetResultsResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch results: ${response.statusText}`;
+      const apiError: ApiError = {
+        message: errorMessage,
+        status: response.status,
+      };
+
+      if (response.status === 401 || response.status === 403) {
+        apiError.message = 'Invalid password. Please check and try again.';
+        apiError.code = 'UNAUTHORIZED';
+      }
+
+      throw apiError;
+    }
+
+    return data as GetResultsResponse;
   } catch (error) {
     if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
       throw error;

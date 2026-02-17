@@ -1,0 +1,271 @@
+.passwordCard {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+}
+
+.passwordContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordContainer .form-input {
+  padding-right: 3rem;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+.eyeButton:hover:not(:disabled) {
+  color: var(--primary-color);
+}
+
+.eyeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.submitBtn {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.loadingOverlay {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 1rem;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resultsContainer {
+  padding: 1.5rem 0;
+}
+
+@media (min-width: 600px) {
+  .resultsContainer {
+    padding: 2rem 0;
+  }
+}
+
+.resultsTitle {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+}
+
+.summaryCard {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.summaryTitle {
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  color: var(--primary-color);
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summaryLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.summaryValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.postCard {
+  background-color: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.postHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.postTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--primary-color);
+  flex: 1;
+}
+
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-height: var(--touch-min);
+}
+
+.downloadBtn:hover {
+  background-color: var(--primary-hover);
+}
+
+.postStats {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.totalVotes {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.candidatesList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.candidateRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.candidateInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.candidateName {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+}
+
+.candidateVotes {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.voteBar {
+  grid-column: 1 / -1;
+  height: 8px;
+  background-color: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.voteBarFill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.percentage {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 0.9375rem;
+  text-align: right;
+  min-width: 50px;
+}
+
+@media (max-width: 600px) {
+  .passwordCard {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .postHeader {
+    flex-direction: column;
+  }
+
+  .downloadBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .candidateRow {
+    grid-template-columns: 1fr;
+  }
+
+  .percentage {
+    text-align: left;
+    margin-top: 0.25rem;
+  }
+}
