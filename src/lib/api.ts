@@ -368,3 +368,65 @@ export async function getCandidatesByPost(postId: number): Promise<GetCandidates
     throw new Error(getNetworkErrorMessage(error));
   }
 }
+
+export interface ElectoralVoter {
+  voter_id: number;
+  sl_no: number;
+  form_no: string;
+  name: string;
+  designation: string;
+  id_no: string;
+  created_at: string;
+}
+
+export interface ElectoralPagination {
+  current_page: number;
+  items_per_page: number;
+  total_items: number;
+  total_pages: number;
+  has_next_page: boolean;
+  has_previous_page: boolean;
+}
+
+export interface ElectoralSummary {
+  total_voters: number;
+}
+
+export interface GetElectoralVotesResponse {
+  voters: ElectoralVoter[];
+  pagination: ElectoralPagination;
+  summary: ElectoralSummary;
+}
+
+/**
+ * Get electoral votes with pagination
+ */
+export async function getElectoralVotes(page: number = 1): Promise<GetElectoralVotesResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/electoral/votes?page=${page}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as GetElectoralVotesResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch electoral votes: ${response.statusText}`;
+      const apiError: ApiError = {
+        message: errorMessage,
+        status: response.status,
+      };
+
+      throw apiError;
+    }
+
+    return data as GetElectoralVotesResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
