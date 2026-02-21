@@ -149,8 +149,8 @@ export function generateElectoralRollPDF(voters: ElectoralVoter[], totalVoters: 
     yPosition += rowHeight;
   });
 
-  // Footer on last page
-  const totalPages = doc.getNumberOfPages();
+  // Footer on each page (getNumberOfPages exists at runtime; types may not declare it)
+  const totalPages = (doc as unknown as { getNumberOfPages(): number }).getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
     doc.setFontSize(7);
