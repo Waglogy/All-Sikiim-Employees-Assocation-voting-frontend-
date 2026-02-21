@@ -1,0 +1,209 @@
+.page {
+  max-width: 800px;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+}
+
+.loading {
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.error {
+  padding: 1rem 1.25rem;
+  background: #fef2f2;
+  color: var(--error);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+.success {
+  padding: 1rem 1.25rem;
+  background: #f0fdf4;
+  color: var(--success);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.btnPrimary {
+  padding: 0.6rem 1.25rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  padding: 0.5rem 1rem;
+  background: var(--bg-color);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background: rgba(26, 79, 139, 0.08);
+}
+
+.btnSecondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnDanger {
+  padding: 0.4rem 0.75rem;
+  background: transparent;
+  color: var(--error);
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.btnDanger:hover {
+  background: #fef2f2;
+}
+
+.btnDangerSmall {
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  color: var(--error);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.btnDangerSmall:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  color: var(--text-secondary);
+}
+
+.postList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.postCard {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  background: var(--card-bg);
+}
+
+.postHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.postTitle {
+  font-size: 1.0625rem;
+  color: var(--primary-color);
+}
+
+.candidates {
+  padding-left: 0.5rem;
+}
+
+.candidatesLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.candidateList {
+  list-style: none;
+  margin-bottom: 0.75rem;
+}
+
+.candidateItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9375rem;
+}
+
+.noCandidates {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.addCandidateForm {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.inputSmall {
+  width: 180px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+}
+
+.inputSmall:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}

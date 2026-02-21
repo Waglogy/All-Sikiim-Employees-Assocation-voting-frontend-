@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import HowToVoteModal from './HowToVoteModal';
+import ElectoralListModal from './ElectoralListModal';
 import styles from './LandingPage.module.css';
 
 export default function LandingPage() {
   const [isHowToVoteOpen, setIsHowToVoteOpen] = useState(false);
+  const [isElectoralListOpen, setIsElectoralListOpen] = useState(false);
 
   return (
     <>
@@ -23,6 +25,14 @@ export default function LandingPage() {
           <p className={styles.heroSubtitle}>
             All Sikkim Govt. Employees Association (C & D Category) — official online voting platform. Stay tuned for the voting date.
           </p>
+          <button
+            type="button"
+            className={styles.heroBtn}
+            onClick={() => setIsElectoralListOpen(true)}
+            aria-label="View electoral list"
+          >
+            View Electoral
+          </button>
         </section>
 
         <section className={styles.section}>
@@ -65,6 +75,10 @@ export default function LandingPage() {
       <HowToVoteModal
         isOpen={isHowToVoteOpen}
         onClose={() => setIsHowToVoteOpen(false)}
+      />
+      <ElectoralListModal
+        isOpen={isElectoralListOpen}
+        onClose={() => setIsElectoralListOpen(false)}
       />
     </>
   );

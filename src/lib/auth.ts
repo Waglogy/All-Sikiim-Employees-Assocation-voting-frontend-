@@ -55,3 +55,30 @@ export function getPhone(): string | null {
   }
   return null;
 }
+
+// --- Admin auth (separate from voter token) ---
+
+const ADMIN_TOKEN_KEY = 'voting_app_admin_token';
+
+export function setAdminToken(token: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(ADMIN_TOKEN_KEY, token);
+  }
+}
+
+export function getAdminToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(ADMIN_TOKEN_KEY);
+  }
+  return null;
+}
+
+export function removeAdminToken(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
+  }
+}
+
+export function isAdminAuthenticated(): boolean {
+  return getAdminToken() !== null;
+}

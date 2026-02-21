@@ -368,3 +368,278 @@ export async function getCandidatesByPost(postId: number): Promise<GetCandidates
     throw new Error(getNetworkErrorMessage(error));
   }
 }
+
+export interface ElectoralVoter {
+  voter_id: number;
+  sl_no: number;
+  form_no: string;
+  name: string;
+  designation: string;
+  id_no: string;
+  created_at: string;
+}
+
+export interface ElectoralPagination {
+  current_page: number;
+  items_per_page: number;
+  total_items: number;
+  total_pages: number;
+  has_next_page: boolean;
+  has_previous_page: boolean;
+}
+
+export interface ElectoralSummary {
+  total_voters: number;
+}
+
+export interface GetElectoralVotesResponse {
+  voters: ElectoralVoter[];
+  pagination: ElectoralPagination;
+  summary: ElectoralSummary;
+}
+
+/**
+ * Get electoral votes with pagination
+ */
+export async function getElectoralVotes(page: number = 1): Promise<GetElectoralVotesResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/electoral/votes?page=${page}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as GetElectoralVotesResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch electoral votes: ${response.statusText}`;
+      const apiError: ApiError = {
+        message: errorMessage,
+        status: response.status,
+      };
+
+      throw apiError;
+    }
+
+    return data as GetElectoralVotesResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+// --- Admin API ---
+
+export interface AdminLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface AdminLoginResponse {
+  token: string;
+  message?: string;
+}
+
+export interface ResultCandidate {
+  candidate_id: number;
+  name: string;
+  votes: number;
+}
+
+export interface ResultPost {
+  post_id: number;
+  title: string;
+  candidates: ResultCandidate[];
+}
+
+export interface GetResultsResponse {
+  results?: ResultPost[];
+}
+
+/**
+ * Admin login. Returns JWT for admin-only endpoints.
+ */
+export async function adminLogin(email: string, password: string): Promise<AdminLoginResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/admin/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Login failed: ${response.statusText}`;
+      const apiError: ApiError = {
+        message: errorMessage,
+        status: response.status,
+      };
+      if (response.status === 401) {
+        apiError.message = (data.message as string) || 'Invalid email or password.';
+      }
+      throw apiError;
+    }
+
+    if (!data.token) {
+      throw new Error('No token received from server');
+    }
+
+    return data as unknown as AdminLoginResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/**
+ * Get voting results. Requires X-Results-Password header (e.g. RESULTS_PASSWORD env).
+ */
+export async function getResults(resultsPassword: string): Promise<GetResultsResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/results`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Results-Password': resultsPassword,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as GetResultsResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch results: ${response.statusText}`;
+      const apiError: ApiError = {
+        message: errorMessage,
+        status: response.status,
+      };
+      throw apiError;
+    }
+
+    return data as GetResultsResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/**
+ * Create a new post (admin only).
+ */
+export async function addPost(adminToken: string, title: string, is_active: boolean = true): Promise<{ post: Post } | { message: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ title, is_active }),
+    });
+
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to add post: ${response.statusText}`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+
+    return data as { post: Post } | { message: string };
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/**
+ * Delete a post (admin only).
+ */
+export async function deletePost(adminToken: string, postId: number): Promise<void> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/posts/${postId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to delete post: ${response.statusText}`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/**
+ * Add a candidate to a post (admin only).
+ */
+export async function addCandidate(adminToken: string, postId: number, name: string): Promise<{ candidate: Candidate } | { message: string }> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/posts/${postId}/candidates`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ name }),
+    });
+
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to add candidate: ${response.statusText}`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+
+    return data as { candidate: Candidate } | { message: string };
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/**
+ * Delete a candidate (admin only).
+ */
+export async function deleteCandidate(adminToken: string, postId: number, candidateId: number): Promise<void> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/posts/${postId}/candidates/${candidateId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to delete candidate: ${response.statusText}`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
