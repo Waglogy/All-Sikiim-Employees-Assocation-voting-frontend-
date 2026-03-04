@@ -5,6 +5,32 @@
     margin: 0 auto;
 }
 
+.votingSoon {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+.votingSoonTitle {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.votingSoonDate {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.votingSoonSub {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+}
+
 .howToVoteSection {
     margin-top: 1.5rem;
     text-align: center;

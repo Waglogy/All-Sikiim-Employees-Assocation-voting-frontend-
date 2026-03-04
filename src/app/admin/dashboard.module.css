@@ -108,6 +108,25 @@
   border: 1px solid #fecaca;
 }
 
+.downloadRow {
+  margin-bottom: 1.25rem;
+}
+
+.downloadBtn {
+  padding: 0.6rem 1.25rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.downloadBtn:hover {
+  background: var(--primary-hover);
+}
+
 .grid {
   display: flex;
   flex-direction: column;

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getResults, GetResultsResponse, ApiError } from '@/lib/api';
+import { getResults, GetResultsResponse, ApiError, getResultPostTitle } from '@/lib/api';
+import { generateResultsReportPDF } from '@/lib/resultsPdfGenerator';
 import styles from './dashboard.module.css';
 
 const UNLOCK_AT_ENV = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_RESULTS_UNLOCK_AT : '';
@@ -127,10 +128,20 @@ export default function AdminDashboardPage() {
       )}
 
       {unlockState.unlocked && data && results.length > 0 ? (
-        <div className={styles.grid}>
+        <>
+          <div className={styles.downloadRow}>
+            <button
+              type="button"
+              onClick={() => generateResultsReportPDF(results)}
+              className={styles.downloadBtn}
+            >
+              Download results
+            </button>
+          </div>
+          <div className={styles.grid}>
           {results.map((post) => (
             <section key={post.post_id} className={styles.card}>
-              <h2 className={styles.cardTitle}>{post.title}</h2>
+              <h2 className={styles.cardTitle}>{getResultPostTitle(post)}</h2>
               <div className={styles.tableWrap}>
                 <table className={styles.table}>
                   <thead>
@@ -143,8 +154,8 @@ export default function AdminDashboardPage() {
                     {post.candidates
                       .slice()
                       .sort((a, b) => b.votes - a.votes)
-                      .map((c) => (
-                        <tr key={c.candidate_id}>
+                      .map((c, i) => (
+                        <tr key={`${post.post_id}-${c.candidate_id}-${i}`}>
                           <td>{c.name}</td>
                           <td className={styles.num}>{c.votes}</td>
                         </tr>
@@ -157,7 +168,8 @@ export default function AdminDashboardPage() {
               </div>
             </section>
           ))}
-        </div>
+          </div>
+        </>
       ) : null}
     </div>
   );

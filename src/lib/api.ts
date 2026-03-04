@@ -451,8 +451,14 @@ export interface ResultCandidate {
 
 export interface ResultPost {
   post_id: number;
-  title: string;
+  title?: string;
+  post_title?: string;
   candidates: ResultCandidate[];
+}
+
+/** Get display title for a result post (backend may send title or post_title). */
+export function getResultPostTitle(post: ResultPost): string {
+  return (post.title ?? post.post_title ?? 'Untitled').trim() || 'Untitled';
 }
 
 export interface GetResultsResponse {
