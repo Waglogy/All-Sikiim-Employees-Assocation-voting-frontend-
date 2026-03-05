@@ -3,12 +3,23 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import HowToVoteModal from './HowToVoteModal';
-import ElectoralListModal from './ElectoralListModal';
 import styles from './LandingPage.module.css';
+
+const ELECTORAL_PDF_URL = '/final_voter_list.pdf';
+const ELECTORAL_PDF_FILENAME = 'final_voter_list.pdf';
 
 export default function LandingPage() {
   const [isHowToVoteOpen, setIsHowToVoteOpen] = useState(false);
-  const [isElectoralListOpen, setIsElectoralListOpen] = useState(false);
+
+  const handleDownloadElectoral = () => {
+    const link = document.createElement('a');
+    link.href = ELECTORAL_PDF_URL;
+    link.download = ELECTORAL_PDF_FILENAME;
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <>
@@ -28,10 +39,10 @@ export default function LandingPage() {
           <button
             type="button"
             className={styles.heroBtn}
-            onClick={() => setIsElectoralListOpen(true)}
-            aria-label="View electoral list"
+            onClick={handleDownloadElectoral}
+            aria-label="Download electoral list PDF"
           >
-            View Electoral
+            Download Electoral
           </button>
         </section>
 
@@ -75,10 +86,6 @@ export default function LandingPage() {
       <HowToVoteModal
         isOpen={isHowToVoteOpen}
         onClose={() => setIsHowToVoteOpen(false)}
-      />
-      <ElectoralListModal
-        isOpen={isElectoralListOpen}
-        onClose={() => setIsElectoralListOpen(false)}
       />
     </>
   );
