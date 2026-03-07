@@ -24,6 +24,7 @@ export default function AdminPostsPage() {
 
   const [newCandidatePostId, setNewCandidatePostId] = useState<number | null>(null);
   const [newCandidateName, setNewCandidateName] = useState('');
+  const [newCandidateImage, setNewCandidateImage] = useState<File | null>(null);
   const [addingCandidate, setAddingCandidate] = useState(false);
 
   const fetchPosts = async () => {
@@ -93,9 +94,10 @@ export default function AdminPostsPage() {
     setAddingCandidate(true);
     setError(null);
     try {
-      await addCandidate(token, postId, name);
+      await addCandidate(token, postId, name, newCandidateImage ?? undefined);
       setNewCandidateName('');
       setNewCandidatePostId(null);
+      setNewCandidateImage(null);
       showSuccess('Candidate added.');
       await fetchPosts();
     } catch (err) {
@@ -186,7 +188,20 @@ export default function AdminPostsPage() {
                     <ul className={styles.candidateList}>
                       {post.candidates.map((c) => (
                         <li key={c.id} className={styles.candidateItem}>
-                          <span>{c.name}</span>
+                          <span className={styles.candidateRow}>
+                            {c.image_url ? (
+                              <img
+                                src={c.image_url}
+                                alt=""
+                                className={styles.candidateThumb}
+                              />
+                            ) : (
+                              <span className={styles.candidatePlaceholder}>
+                                {c.name.charAt(0)}
+                              </span>
+                            )}
+                            <span>{c.name}</span>
+                          </span>
                           <button
                             type="button"
                             onClick={() => handleDeleteCandidate(post.id, c.id, c.name)}
@@ -208,6 +223,7 @@ export default function AdminPostsPage() {
                       type="text"
                       value={newCandidatePostId === post.id ? newCandidateName : ''}
                       onChange={(e) => {
+                        if (newCandidatePostId !== post.id) setNewCandidateImage(null);
                         setNewCandidatePostId(post.id);
                         setNewCandidateName(e.target.value);
                       }}
@@ -215,6 +231,24 @@ export default function AdminPostsPage() {
                       className={styles.inputSmall}
                       disabled={addingCandidate}
                     />
+                    <label className={styles.fileLabel}>
+                      <span className={styles.fileLabelText}>Photo (optional)</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        className={styles.fileInput}
+                        onChange={(e) => {
+                          if (newCandidatePostId !== post.id) setNewCandidateName('');
+                          setNewCandidatePostId(post.id);
+                          const file = e.target.files?.[0];
+                          setNewCandidateImage(file ?? null);
+                        }}
+                        disabled={addingCandidate}
+                      />
+                      {newCandidatePostId === post.id && newCandidateImage && (
+                        <span className={styles.fileName}>{newCandidateImage.name}</span>
+                      )}
+                    </label>
                     <button
                       type="submit"
                       className={styles.btnSecondary}

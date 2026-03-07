@@ -5,11 +5,12 @@ import { Post, Candidate } from './mockData';
  * Transform backend candidate to frontend format
  */
 function transformCandidate(backendCandidate: BackendCandidate, postId: number): Candidate {
+  const imageUrl = backendCandidate.image_url ?? backendCandidate.photo_url ?? '';
   return {
     id: `${postId}-${backendCandidate.id}`, // Create unique string ID: "postId-candidateId"
     name: backendCandidate.name,
     department: backendCandidate.department || 'N/A',
-    photoUrl: backendCandidate.photo_url || '',
+    photoUrl: typeof imageUrl === 'string' ? imageUrl : '',
   };
 }
 

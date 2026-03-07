@@ -75,7 +75,10 @@ export interface Candidate {
   id: number;
   name: string;
   department?: string;
+  /** @deprecated use image_url */
   photo_url?: string;
+  /** Cloudinary URL or null when no image uploaded */
+  image_url?: string | null;
 }
 
 export interface PostWithCandidates extends Post {
@@ -590,16 +593,27 @@ export async function deletePost(adminToken: string, postId: number): Promise<vo
 
 /**
  * Add a candidate to a post (admin only).
+ * Uses multipart/form-data: name (required), image (optional file, e.g. JPEG/PNG/WebP/GIF, max 5 MB).
  */
-export async function addCandidate(adminToken: string, postId: number, name: string): Promise<{ candidate: Candidate } | { message: string }> {
+export async function addCandidate(
+  adminToken: string,
+  postId: number,
+  name: string,
+  image?: File | null
+): Promise<{ candidate: Candidate } | { message: string }> {
   try {
+    const formData = new FormData();
+    formData.append('name', name.trim());
+    if (image) {
+      formData.append('image', image);
+    }
+
     const response = await fetch(`${BASE_URL}/api/posts/${postId}/candidates`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${adminToken}`,
       },
-      body: JSON.stringify({ name }),
+      body: formData,
     });
 
     const data = (await parseJsonResponse(response)) as Record<string, unknown>;
