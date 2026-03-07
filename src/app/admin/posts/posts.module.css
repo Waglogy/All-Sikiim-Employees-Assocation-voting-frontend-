@@ -181,6 +181,69 @@
   font-size: 0.9375rem;
 }
 
+.candidateRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.candidateThumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--border-color);
+}
+
+.candidatePlaceholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.fileLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.fileLabelText {
+  white-space: nowrap;
+}
+
+.fileInput {
+  font-size: 0.8125rem;
+  max-width: 160px;
+}
+
+.fileInput::file-selector-button {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-color);
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+
+.fileName {
+  font-size: 0.8125rem;
+  color: var(--primary-color);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .noCandidates {
   font-size: 0.875rem;
   color: var(--text-secondary);
