@@ -4,11 +4,10 @@ import { useState } from 'react';
 import styles from './HowToVoteModal.module.css';
 
 /**
- * Add your YouTube video ID here (the part after "v=" in the URL).
- * Example: for https://www.youtube.com/watch?v=abc123 use "abc123"
- * Leave empty to show a placeholder until you add the video.
+ * YouTube video ID for the "How to Vote" tutorial.
+ * From https://youtu.be/hNffSW59VHQ
  */
-const HOW_TO_VOTE_VIDEO_ID = '';
+const HOW_TO_VOTE_VIDEO_ID = 'hNffSW59VHQ';
 
 type Lang = 'en' | 'ne';
 
