@@ -5,21 +5,8 @@ import Link from 'next/link';
 import HowToVoteModal from './HowToVoteModal';
 import styles from './LandingPage.module.css';
 
-const ELECTORAL_PDF_URL = '/final_voter_list.pdf';
-const ELECTORAL_PDF_FILENAME = 'final_voter_list.pdf';
-
 export default function LandingPage() {
   const [isHowToVoteOpen, setIsHowToVoteOpen] = useState(false);
-
-  const handleDownloadElectoral = () => {
-    const link = document.createElement('a');
-    link.href = ELECTORAL_PDF_URL;
-    link.download = ELECTORAL_PDF_FILENAME;
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   return (
     <>
@@ -36,14 +23,6 @@ export default function LandingPage() {
           <p className={styles.heroSubtitle}>
             All Sikkim Govt. Employees Association (C & D Category) — official online voting platform. Stay tuned for the voting date.
           </p>
-          <button
-            type="button"
-            className={styles.heroBtn}
-            onClick={handleDownloadElectoral}
-            aria-label="Download electoral list PDF"
-          >
-            Download Electoral
-          </button>
         </section>
 
         <section className={styles.section}>
