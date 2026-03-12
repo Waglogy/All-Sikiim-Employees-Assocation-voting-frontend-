@@ -13,34 +13,29 @@ export default function LandingPage() {
       <div className={styles.landing}>
         <section className={styles.hero}>
           <img
-            src="/logo.png"
+            src="/logo.jpeg"
             alt="All Sikkim Govt. Employees Association"
             className={styles.heroLogo}
             fetchPriority="high"
           />
-          <div className={styles.heroBadge}>SGEA Election 2024</div>
-          <h1 className={styles.heroTitle}>Voting Day Will Be Announced Soon</h1>
+          <div className={styles.heroBadge}>asgea election 2026</div>
+          <h1 className={styles.heroTitle}>Welcome to the ASGEA Voting Platform</h1>
           <p className={styles.heroSubtitle}>
-            All Sikkim Govt. Employees Association (C & D Category) — official online voting platform. Stay tuned for the voting date.
+            All Sikkim Govt. Employees Association (C & D Category) — official online voting platform.
           </p>
         </section>
 
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Voting Is Coming Soon</h2>
+          <h2 className={styles.sectionTitle}>Voting Date & Time</h2>
           <p className={styles.sectionText}>
-            This is the official voting platform for the SGEA C & D Category elections. Eligible members will be able to cast their vote securely using their registered mobile number.
+            The ASGEA C & D Category election will be held on 16th March 2026 from 8:00 AM to 2:00 PM.
           </p>
-          <ul className={styles.infoList}>
-            <li>Vote from your phone or computer — no need to visit in person.</li>
-            <li>One-time OTP sent to your registered 10-digit mobile number.</li>
-            <li>One vote per member; once submitted, it cannot be changed.</li>
-          </ul>
         </section>
 
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>How You Can Vote</h2>
           <p className={styles.sectionText}>
-            When voting opens, you will log in with your phone number, receive an OTP, select your preferred candidate for each post, and submit your vote. Full step-by-step instructions are available below.
+            Enter your registered mobile number and the OTP received in the message to access the ballot and cast your vote.
           </p>
           <div className={styles.buttonRow}>
             <button
@@ -51,13 +46,6 @@ export default function LandingPage() {
             >
               See How to Vote (English / नेपाली)
             </button>
-            <Link
-              href="/login"
-              className={styles.loginBtn}
-              aria-label="Go to login page"
-            >
-              Login
-            </Link>
           </div>
         </section>
       </div>

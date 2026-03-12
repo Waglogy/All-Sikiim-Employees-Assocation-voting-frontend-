@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   title: 'ASGEA Voting Platform',
   description: 'Official Voting Platform for Sikkim Government Employees Association ( C & D Category)',
   icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
+    icon: '/logo.jpeg',
+    apple: '/logo.jpeg',
   },
 };
 

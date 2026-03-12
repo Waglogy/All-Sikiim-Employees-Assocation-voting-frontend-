@@ -7,7 +7,7 @@ export default function Header() {
                 <div className={styles.logoSection}>
                     <div className={styles.logoCircle}>
                         <img
-                            src="/logo.png"
+                            src="/logo.jpeg"
                             alt="All Sikkim Govt. Employees Association"
                             className={styles.logoImage}
                             fetchPriority="high"

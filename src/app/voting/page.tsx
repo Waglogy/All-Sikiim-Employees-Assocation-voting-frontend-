@@ -149,7 +149,7 @@ export default function VotingPage() {
     return (
         <div className="container">
             <h1 className="ballot-title">
-                SGEA Election 2024 Ballot
+                asgea election 2026 ballot
             </h1>
 
             {error && (
