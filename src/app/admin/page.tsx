@@ -1,9 +1,26 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getResults, getVotesCount, GetResultsResponse, ApiError } from '@/lib/api';
+import { getResults, getVotesCount, GetResultsResponse, ApiError, ResultPost } from '@/lib/api';
 import { getAdminToken } from '@/lib/auth';
+import { generateFormVIIPDF } from '@/lib/formVIIPdfGenerator';
 import styles from './dashboard.module.css';
+
+/** Load logo from public path and return as base64 data URL for PDF. */
+async function loadLogoDataUrl(): Promise<string | undefined> {
+  try {
+    const res = await fetch('/logo.jpeg');
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return undefined;
+  }
+}
 
 const UNLOCK_AT_ENV = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_RESULTS_UNLOCK_AT : '';
 
@@ -49,6 +66,17 @@ export default function AdminDashboardPage() {
   const [votesCount, setVotesCount] = useState<number | null>(null);
   const [votesCountLoading, setVotesCountLoading] = useState(false);
   const [votesCountError, setVotesCountError] = useState<string | null>(null);
+  const [downloadingPostId, setDownloadingPostId] = useState<number | null>(null);
+
+  const handleDownloadFormVII = useCallback(async (post: ResultPost) => {
+    setDownloadingPostId(post.post_id);
+    try {
+      const logoDataUrl = await loadLogoDataUrl();
+      generateFormVIIPDF(post, logoDataUrl);
+    } finally {
+      setDownloadingPostId(null);
+    }
+  }, []);
 
   const fetchVotesCount = useCallback(async () => {
     const token = getAdminToken();
@@ -180,9 +208,20 @@ export default function AdminDashboardPage() {
 
       {unlockState.unlocked && data && results.length > 0 ? (
         <div className={styles.grid}>
-          {results.map((post) => (
+          {results.map((post, index) => (
             <section key={post.post_id} className={styles.card}>
-              <h2 className={styles.cardTitle}>{post.title}</h2>
+              <div className={styles.cardHeaderRow}>
+                <h2 className={styles.cardTitle}>{post.title}</h2>
+                <button
+                  type="button"
+                  onClick={() => handleDownloadFormVII(post)}
+                  disabled={downloadingPostId === post.post_id}
+                  className={styles.formVIIBtn}
+                  title={`Download Form-VII (1) ${index + 1} — Result of Counting of Votes`}
+                >
+                  {downloadingPostId === post.post_id ? 'Preparing…' : `Download Form-VII (1) ${index + 1}`}
+                </button>
+              </div>
               <div className={styles.tableWrap}>
                 <table className={styles.table}>
                   <thead>
@@ -195,8 +234,8 @@ export default function AdminDashboardPage() {
                     {post.candidates
                       .slice()
                       .sort((a, b) => b.votes - a.votes)
-                      .map((c) => (
-                        <tr key={c.candidate_id}>
+                      .map((c, i) => (
+                        <tr key={`${post.post_id}-${c.candidate_id ?? i}`}>
                           <td>{c.name}</td>
                           <td className={styles.num}>{c.votes}</td>
                         </tr>

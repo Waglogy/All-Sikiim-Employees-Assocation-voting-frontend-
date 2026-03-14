@@ -201,12 +201,41 @@
   padding: 1.25rem 1.5rem;
 }
 
-.cardTitle {
-  font-size: 1.125rem;
-  color: var(--primary-color);
+.cardHeaderRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border-color);
+}
+
+.cardTitle {
+  font-size: 1.125rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.formVIIBtn {
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.formVIIBtn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.formVIIBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .tableWrap {
