@@ -82,6 +82,77 @@
   background: rgba(255, 255, 255, 0.35);
 }
 
+.resendOtpSection {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.resendOtpTitle {
+  font-size: 1.125rem;
+  color: var(--primary-color);
+  margin: 0 0 0.5rem 0;
+}
+
+.resendOtpHint {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 1rem 0;
+}
+
+.resendOtpForm {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.resendOtpInput {
+  width: 200px;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+.resendOtpInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.resendOtpBtn {
+  padding: 0.6rem 1.25rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.resendOtpBtn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.resendOtpBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.resendOtpSuccess {
+  margin: 0.75rem 0 0 0;
+  font-size: 0.9375rem;
+  color: #166534;
+}
+
+.resendOtpError {
+  margin: 0.75rem 0 0 0;
+  font-size: 0.9375rem;
+  color: var(--error);
+}
+
 .pageTitle {
   font-size: 1.5rem;
   color: var(--primary-color);

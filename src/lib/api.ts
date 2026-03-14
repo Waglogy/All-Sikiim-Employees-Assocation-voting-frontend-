@@ -172,6 +172,44 @@ export async function sendOtp(phone: string): Promise<SendOtpResponse> {
 }
 
 /**
+ * Resend OTP to a voter's phone (e.g. they didn't receive it). Phone must exist in voters table.
+ */
+export async function resendOtp(phone: string): Promise<SendOtpResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/auth/resend-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ phone }),
+    });
+
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to resend OTP: ${response.statusText}`;
+      const apiError: ApiError = {
+        message: errorMessage,
+        status: response.status,
+      };
+      if (response.status === 404) {
+        apiError.message = 'Phone number not found in voter database.';
+      } else if (response.status === 400) {
+        apiError.message = (data.message as string) || 'Invalid phone number format.';
+      }
+      throw apiError;
+    }
+
+    return data as unknown as SendOtpResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/**
  * Verify OTP and get JWT token
  */
 export async function verifyOtp(phone: string, otp: string): Promise<VerifyOtpResponse> {
@@ -571,6 +609,55 @@ export async function getVotesCount(adminToken: string): Promise<VotesCountRespo
     }
 
     return data as VotesCountResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/** Single OTP log entry from GET /api/admin/otp-logs/search (admin only). */
+export interface OtpLogEntry {
+  id: number;
+  phone: string;
+  expires_at: string;
+  is_used: boolean;
+  created_at: string;
+  voter_form_numbers: string[] | string;
+}
+
+/** Response from GET /api/admin/otp-logs/search (admin only). */
+export interface SearchOtpLogsResponse {
+  otp_logs: OtpLogEntry[];
+}
+
+/**
+ * Search OTP logs by form number (admin only). Requires admin JWT.
+ * Query: form_no (required), e.g. F001.
+ */
+export async function searchOtpLogsByFormNo(adminToken: string, formNo: string): Promise<SearchOtpLogsResponse> {
+  const trimmed = String(formNo ?? '').trim();
+  if (!trimmed) {
+    throw { message: 'Form number is required.', status: 400 } as ApiError;
+  }
+  try {
+    const params = new URLSearchParams({ form_no: trimmed });
+    const response = await fetch(`${BASE_URL}/api/admin/otp-logs/search?${params}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as SearchOtpLogsResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to search OTP logs: ${response.statusText}`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+
+    return data as SearchOtpLogsResponse;
   } catch (error) {
     if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
       throw error;
