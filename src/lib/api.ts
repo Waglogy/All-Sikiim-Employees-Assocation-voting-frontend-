@@ -98,6 +98,13 @@ export interface GetCandidatesByPostResponse {
   candidates: Candidate[];
 }
 
+/** Response from GET /api/posts/voter-by-serial (admin only). Used to auto-fill name when adding a candidate. */
+export interface VoterBySerialResponse {
+  voter_sl_no: number;
+  voter_id: number;
+  name: string;
+}
+
 /**
  * Check if the backend is running
  */
@@ -372,6 +379,43 @@ export async function getCandidatesByPost(postId: number): Promise<GetCandidates
   }
 }
 
+/**
+ * Get voter by serial number (admin only). Use to auto-fill the name field when adding a candidate.
+ * Returns voter_sl_no, voter_id, name.
+ */
+export async function getVoterBySerial(
+  adminToken: string,
+  voterSlNo: string
+): Promise<VoterBySerialResponse> {
+  const trimmed = String(voterSlNo).trim();
+  if (!trimmed) {
+    throw { message: 'Voter serial number is required.', status: 400 } as ApiError;
+  }
+  try {
+    const params = new URLSearchParams({ voter_sl_no: trimmed });
+    const response = await fetch(`${BASE_URL}/api/posts/voter-by-serial?${params}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as VoterBySerialResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Voter not found for serial ${trimmed}.`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+
+    return data as VoterBySerialResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
 export interface ElectoralVoter {
   voter_id: number;
   sl_no: number;
@@ -593,16 +637,19 @@ export async function deletePost(adminToken: string, postId: number): Promise<vo
 
 /**
  * Add a candidate to a post (admin only).
- * Uses multipart/form-data: name (required), image (optional file, e.g. JPEG/PNG/WebP/GIF, max 5 MB).
+ * Uses multipart/form-data: voter_sl_no (required, first), name (required), image (optional file).
+ * voter_sl_no must exist in voters table (voters.vtr_sl_no).
  */
 export async function addCandidate(
   adminToken: string,
   postId: number,
+  voterSlNo: string,
   name: string,
   image?: File | null
 ): Promise<{ candidate: Candidate } | { message: string }> {
   try {
     const formData = new FormData();
+    formData.append('voter_sl_no', String(voterSlNo).trim());
     formData.append('name', name.trim());
     if (image) {
       formData.append('image', image);
