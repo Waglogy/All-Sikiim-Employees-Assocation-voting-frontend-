@@ -546,6 +546,39 @@ export async function adminLogin(email: string, password: string): Promise<Admin
   }
 }
 
+/** Response from GET /api/admin/votes-count (admin only). */
+export interface VotesCountResponse {
+  total_votes: number;
+}
+
+/**
+ * Get total number of votes cast (admin only). Requires admin JWT.
+ */
+export async function getVotesCount(adminToken: string): Promise<VotesCountResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/admin/votes-count`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as VotesCountResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch votes count: ${response.statusText}`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+
+    return data as VotesCountResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
 /**
  * Get voting results. Requires X-Results-Password header (e.g. RESULTS_PASSWORD env).
  */

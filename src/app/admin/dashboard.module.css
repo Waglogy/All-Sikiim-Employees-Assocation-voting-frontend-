@@ -2,6 +2,86 @@
   max-width: 900px;
 }
 
+.votesCountSection {
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, #0f3d6b 100%);
+  border-radius: var(--radius-lg);
+  color: #fff;
+  text-align: center;
+}
+
+.votesCountLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.95;
+  margin-bottom: 0.5rem;
+}
+
+.votesCountNumber {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.votesCountRefresh {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.votesCountRefresh:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.votesCountRefresh:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.votesCountHint {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.votesCountError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.votesCountError span {
+  font-size: 1rem;
+}
+
+.votesCountRetry {
+  padding: 0.4rem 0.75rem;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.votesCountRetry:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
 .pageTitle {
   font-size: 1.5rem;
   color: var(--primary-color);
