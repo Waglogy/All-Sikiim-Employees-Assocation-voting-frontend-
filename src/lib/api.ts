@@ -98,6 +98,13 @@ export interface GetCandidatesByPostResponse {
   candidates: Candidate[];
 }
 
+/** Response from GET /api/posts/voter-by-serial (admin only). Used to auto-fill name when adding a candidate. */
+export interface VoterBySerialResponse {
+  voter_sl_no: number;
+  voter_id: number;
+  name: string;
+}
+
 /**
  * Check if the backend is running
  */
@@ -152,6 +159,44 @@ export async function sendOtp(phone: string): Promise<SendOtpResponse> {
         apiError.message = (data.message as string) || 'Invalid phone number format.';
       }
 
+      throw apiError;
+    }
+
+    return data as unknown as SendOtpResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/**
+ * Resend OTP to a voter's phone (e.g. they didn't receive it). Phone must exist in voters table.
+ */
+export async function resendOtp(phone: string): Promise<SendOtpResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/auth/resend-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ phone }),
+    });
+
+    const data = (await parseJsonResponse(response)) as Record<string, unknown>;
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to resend OTP: ${response.statusText}`;
+      const apiError: ApiError = {
+        message: errorMessage,
+        status: response.status,
+      };
+      if (response.status === 404) {
+        apiError.message = 'Phone number not found in voter database.';
+      } else if (response.status === 400) {
+        apiError.message = (data.message as string) || 'Invalid phone number format.';
+      }
       throw apiError;
     }
 
@@ -372,6 +417,43 @@ export async function getCandidatesByPost(postId: number): Promise<GetCandidates
   }
 }
 
+/**
+ * Get voter by serial number (admin only). Use to auto-fill the name field when adding a candidate.
+ * Returns voter_sl_no, voter_id, name.
+ */
+export async function getVoterBySerial(
+  adminToken: string,
+  voterSlNo: string
+): Promise<VoterBySerialResponse> {
+  const trimmed = String(voterSlNo).trim();
+  if (!trimmed) {
+    throw { message: 'Voter serial number is required.', status: 400 } as ApiError;
+  }
+  try {
+    const params = new URLSearchParams({ voter_sl_no: trimmed });
+    const response = await fetch(`${BASE_URL}/api/posts/voter-by-serial?${params}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as VoterBySerialResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Voter not found for serial ${trimmed}.`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+
+    return data as VoterBySerialResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
 export interface ElectoralVoter {
   voter_id: number;
   sl_no: number;
@@ -502,6 +584,88 @@ export async function adminLogin(email: string, password: string): Promise<Admin
   }
 }
 
+/** Response from GET /api/admin/votes-count (admin only). */
+export interface VotesCountResponse {
+  total_votes: number;
+}
+
+/**
+ * Get total number of votes cast (admin only). Requires admin JWT.
+ */
+export async function getVotesCount(adminToken: string): Promise<VotesCountResponse> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/admin/votes-count`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as VotesCountResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to fetch votes count: ${response.statusText}`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+
+    return data as VotesCountResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
+/** Single OTP log entry from GET /api/admin/otp-logs/search (admin only). */
+export interface OtpLogEntry {
+  id: number;
+  phone: string;
+  expires_at: string;
+  is_used: boolean;
+  created_at: string;
+  voter_form_numbers: string[] | string;
+}
+
+/** Response from GET /api/admin/otp-logs/search (admin only). */
+export interface SearchOtpLogsResponse {
+  otp_logs: OtpLogEntry[];
+}
+
+/**
+ * Search OTP logs by form number (admin only). Requires admin JWT.
+ * Query: form_no (required), e.g. F001.
+ */
+export async function searchOtpLogsByFormNo(adminToken: string, formNo: string): Promise<SearchOtpLogsResponse> {
+  const trimmed = String(formNo ?? '').trim();
+  if (!trimmed) {
+    throw { message: 'Form number is required.', status: 400 } as ApiError;
+  }
+  try {
+    const params = new URLSearchParams({ form_no: trimmed });
+    const response = await fetch(`${BASE_URL}/api/admin/otp-logs/search?${params}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${adminToken}`,
+      },
+    });
+
+    const data = (await parseJsonResponse(response)) as SearchOtpLogsResponse & { message?: string; error?: string };
+
+    if (!response.ok) {
+      const errorMessage = (data.message as string) || (data.error as string) || `Failed to search OTP logs: ${response.statusText}`;
+      throw { message: errorMessage, status: response.status } as ApiError;
+    }
+
+    return data as SearchOtpLogsResponse;
+  } catch (error) {
+    if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
+      throw error;
+    }
+    throw new Error(getNetworkErrorMessage(error));
+  }
+}
+
 /**
  * Get voting results. Requires X-Results-Password header (e.g. RESULTS_PASSWORD env).
  */
@@ -593,16 +757,19 @@ export async function deletePost(adminToken: string, postId: number): Promise<vo
 
 /**
  * Add a candidate to a post (admin only).
- * Uses multipart/form-data: name (required), image (optional file, e.g. JPEG/PNG/WebP/GIF, max 5 MB).
+ * Uses multipart/form-data: voter_sl_no (required, first), name (required), image (optional file).
+ * voter_sl_no must exist in voters table (voters.vtr_sl_no).
  */
 export async function addCandidate(
   adminToken: string,
   postId: number,
+  voterSlNo: string,
   name: string,
   image?: File | null
 ): Promise<{ candidate: Candidate } | { message: string }> {
   try {
     const formData = new FormData();
+    formData.append('voter_sl_no', String(voterSlNo).trim());
     formData.append('name', name.trim());
     if (image) {
       formData.append('image', image);

@@ -9,6 +9,8 @@ import styles from './admin.module.css';
 const SIDEBAR_LINKS = [
   { href: '/admin', label: 'Dashboard', icon: '📊' },
   { href: '/admin/posts', label: 'Posts & Candidates', icon: '📋' },
+  { href: '/admin/resend-otp', label: 'OTP Resend', icon: '📱' },
+  { href: '/admin/otp-logs', label: 'OTP Logs', icon: '📋' },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {

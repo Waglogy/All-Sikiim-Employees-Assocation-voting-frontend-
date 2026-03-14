@@ -1,8 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { getResults, GetResultsResponse, ApiError } from '@/lib/api';
+import { useState, useEffect, useCallback } from 'react';
+import { getResults, getVotesCount, GetResultsResponse, ApiError, ResultPost } from '@/lib/api';
+import { getAdminToken } from '@/lib/auth';
+import { generateFormVIIPDF } from '@/lib/formVIIPdfGenerator';
 import styles from './dashboard.module.css';
+
+/** Load logo from public path and return as base64 data URL for PDF. */
+async function loadLogoDataUrl(): Promise<string | undefined> {
+  try {
+    const res = await fetch('/logo.jpeg');
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return undefined;
+  }
+}
 
 const UNLOCK_AT_ENV = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_RESULTS_UNLOCK_AT : '';
 
@@ -45,6 +63,45 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [unlockState, setUnlockState] = useState<{ unlocked: boolean; formatted: string }>({ unlocked: false, formatted: '' });
 
+  const [votesCount, setVotesCount] = useState<number | null>(null);
+  const [votesCountLoading, setVotesCountLoading] = useState(false);
+  const [votesCountError, setVotesCountError] = useState<string | null>(null);
+  const [downloadingPostId, setDownloadingPostId] = useState<number | null>(null);
+
+  const handleDownloadFormVII = useCallback(async (post: ResultPost) => {
+    setDownloadingPostId(post.post_id);
+    try {
+      const logoDataUrl = await loadLogoDataUrl();
+      generateFormVIIPDF(post, logoDataUrl);
+    } finally {
+      setDownloadingPostId(null);
+    }
+  }, []);
+
+  const fetchVotesCount = useCallback(async () => {
+    const token = getAdminToken();
+    if (!token) {
+      setVotesCount(null);
+      return;
+    }
+    setVotesCountLoading(true);
+    setVotesCountError(null);
+    try {
+      const res = await getVotesCount(token);
+      setVotesCount(res.total_votes);
+    } catch (err) {
+      const apiErr = err as ApiError;
+      setVotesCountError(apiErr.message || 'Failed to load vote count.');
+      setVotesCount(null);
+    } finally {
+      setVotesCountLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchVotesCount();
+  }, [fetchVotesCount]);
+
   useEffect(() => {
     setUnlockState((prev) => {
       const { unlocked, formatted } = isResultsUnlocked();
@@ -82,6 +139,29 @@ export default function AdminDashboardPage() {
     <div className={styles.page}>
       <h1 className={styles.pageTitle}>Dashboard</h1>
       <p className={styles.subtitle}>Voting results by post</p>
+
+      <section className={styles.votesCountSection} aria-label="Total votes cast">
+        {!getAdminToken() ? (
+          <p className={styles.votesCountHint}>Log in as admin to see total votes cast.</p>
+        ) : votesCountLoading ? (
+          <p className={styles.votesCountHint}>Loading vote count…</p>
+        ) : votesCountError ? (
+          <div className={styles.votesCountError}>
+            <span>{votesCountError}</span>
+            <button type="button" onClick={fetchVotesCount} className={styles.votesCountRetry}>
+              Retry
+            </button>
+          </div>
+        ) : votesCount !== null ? (
+          <>
+            <p className={styles.votesCountLabel}>Total votes cast</p>
+            <p className={styles.votesCountNumber}>{votesCount.toLocaleString()}</p>
+            <button type="button" onClick={fetchVotesCount} className={styles.votesCountRefresh} disabled={votesCountLoading}>
+              Refresh
+            </button>
+          </>
+        ) : null}
+      </section>
 
       {!unlockState.unlocked ? (
         <div className={styles.locked}>
@@ -128,9 +208,20 @@ export default function AdminDashboardPage() {
 
       {unlockState.unlocked && data && results.length > 0 ? (
         <div className={styles.grid}>
-          {results.map((post) => (
+          {results.map((post, index) => (
             <section key={post.post_id} className={styles.card}>
-              <h2 className={styles.cardTitle}>{post.title}</h2>
+              <div className={styles.cardHeaderRow}>
+                <h2 className={styles.cardTitle}>{post.title}</h2>
+                <button
+                  type="button"
+                  onClick={() => handleDownloadFormVII(post)}
+                  disabled={downloadingPostId === post.post_id}
+                  className={styles.formVIIBtn}
+                  title={`Download Form-VII (1) ${index + 1} — Result of Counting of Votes`}
+                >
+                  {downloadingPostId === post.post_id ? 'Preparing…' : `Download Form-VII (1) ${index + 1}`}
+                </button>
+              </div>
               <div className={styles.tableWrap}>
                 <table className={styles.table}>
                   <thead>
@@ -143,8 +234,8 @@ export default function AdminDashboardPage() {
                     {post.candidates
                       .slice()
                       .sort((a, b) => b.votes - a.votes)
-                      .map((c) => (
-                        <tr key={c.candidate_id}>
+                      .map((c, i) => (
+                        <tr key={`${post.post_id}-${c.candidate_id ?? i}`}>
                           <td>{c.name}</td>
                           <td className={styles.num}>{c.votes}</td>
                         </tr>

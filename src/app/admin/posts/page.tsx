@@ -7,6 +7,7 @@ import {
   deletePost,
   addCandidate,
   deleteCandidate,
+  getVoterBySerial,
   ApiError,
   PostWithCandidates,
 } from '@/lib/api';
@@ -23,9 +24,11 @@ export default function AdminPostsPage() {
   const [addingPost, setAddingPost] = useState(false);
 
   const [newCandidatePostId, setNewCandidatePostId] = useState<number | null>(null);
+  const [newCandidateVoterSlNo, setNewCandidateVoterSlNo] = useState('');
   const [newCandidateName, setNewCandidateName] = useState('');
   const [newCandidateImage, setNewCandidateImage] = useState<File | null>(null);
   const [addingCandidate, setAddingCandidate] = useState(false);
+  const [lookupVoterLoading, setLookupVoterLoading] = useState(false);
 
   const fetchPosts = async () => {
     const token = getAdminToken();
@@ -72,6 +75,23 @@ export default function AdminPostsPage() {
     }
   };
 
+  const handleLookupVoter = async () => {
+    const token = getAdminToken();
+    const voterSlNo = newCandidateVoterSlNo.trim();
+    if (!token || !voterSlNo) return;
+    setLookupVoterLoading(true);
+    setError(null);
+    try {
+      const res = await getVoterBySerial(token, voterSlNo);
+      setNewCandidateName(res.name ?? '');
+    } catch (err) {
+      const apiErr = err as ApiError;
+      setError(apiErr.message || 'Voter not found.');
+    } finally {
+      setLookupVoterLoading(false);
+    }
+  };
+
   const handleDeletePost = async (postId: number, title: string) => {
     const token = getAdminToken();
     if (!token || !confirm(`Delete post "${title}"? This will remove all candidates and votes for this post.`)) return;
@@ -89,12 +109,14 @@ export default function AdminPostsPage() {
   const handleAddCandidate = async (e: React.FormEvent, postId: number) => {
     e.preventDefault();
     const token = getAdminToken();
+    const voterSlNo = newCandidateVoterSlNo.trim();
     const name = newCandidateName.trim();
-    if (!token || !name) return;
+    if (!token || !voterSlNo || !name) return;
     setAddingCandidate(true);
     setError(null);
     try {
-      await addCandidate(token, postId, name, newCandidateImage ?? undefined);
+      await addCandidate(token, postId, voterSlNo, name, newCandidateImage ?? undefined);
+      setNewCandidateVoterSlNo('');
       setNewCandidateName('');
       setNewCandidatePostId(null);
       setNewCandidateImage(null);
@@ -221,13 +243,41 @@ export default function AdminPostsPage() {
                   >
                     <input
                       type="text"
+                      inputMode="numeric"
+                      value={newCandidatePostId === post.id ? newCandidateVoterSlNo : ''}
+                      onChange={(e) => {
+                        if (newCandidatePostId !== post.id) setNewCandidateImage(null);
+                        setNewCandidatePostId(post.id);
+                        setNewCandidateVoterSlNo(e.target.value);
+                      }}
+                      onBlur={() => {
+                        if (newCandidatePostId === post.id && newCandidateVoterSlNo.trim()) {
+                          handleLookupVoter();
+                        }
+                      }}
+                      placeholder="Voter SL No."
+                      className={styles.inputSmall}
+                      disabled={addingCandidate}
+                      title="Voter serial number (voters.vtr_sl_no) - required"
+                    />
+                    <button
+                      type="button"
+                      className={styles.btnSecondary}
+                      onClick={handleLookupVoter}
+                      disabled={addingCandidate || lookupVoterLoading || !newCandidateVoterSlNo.trim() || newCandidatePostId !== post.id}
+                      title="Fetch voter name from electoral roll"
+                    >
+                      {lookupVoterLoading ? '…' : 'Lookup'}
+                    </button>
+                    <input
+                      type="text"
                       value={newCandidatePostId === post.id ? newCandidateName : ''}
                       onChange={(e) => {
                         if (newCandidatePostId !== post.id) setNewCandidateImage(null);
                         setNewCandidatePostId(post.id);
                         setNewCandidateName(e.target.value);
                       }}
-                      placeholder="New candidate name"
+                      placeholder="Candidate name"
                       className={styles.inputSmall}
                       disabled={addingCandidate}
                     />
@@ -252,7 +302,7 @@ export default function AdminPostsPage() {
                     <button
                       type="submit"
                       className={styles.btnSecondary}
-                      disabled={addingCandidate || (newCandidatePostId === post.id && !newCandidateName.trim())}
+                      disabled={addingCandidate || (newCandidatePostId === post.id && (!newCandidateVoterSlNo.trim() || !newCandidateName.trim()))}
                     >
                       Add candidate
                     </button>
