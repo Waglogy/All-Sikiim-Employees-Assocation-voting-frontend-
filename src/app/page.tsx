@@ -1,9 +1,9 @@
-import LandingPage from "@/components/LandingPage";
+import VotingScheduleGate from '@/components/VotingScheduleGate';
 
 export default function Home() {
   return (
-    <div className="container">
-      <LandingPage />
+    <div className="container login-wrapper">
+      <VotingScheduleGate />
     </div>
   );
 }
