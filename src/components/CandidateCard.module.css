@@ -38,27 +38,30 @@
     box-shadow: 0 0 0 2px rgba(26, 79, 139, 0.2);
 }
 
+/* Passport-size image: 3:4 portrait ratio, clear and visible */
 .image {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
+    width: 84px;
+    height: 112px;
+    border-radius: 4px;
     object-fit: cover;
+    object-position: center top;
     margin-bottom: 0.5rem;
     background-color: var(--border-color);
+    display: block;
 }
 
 @media (min-width: 360px) {
     .image {
-        width: 84px;
-        height: 84px;
+        width: 96px;
+        height: 128px;
         margin-bottom: 0.625rem;
     }
 }
 
 @media (min-width: 600px) {
     .image {
-        width: 96px;
-        height: 96px;
+        width: 112px;
+        height: 149px;
         margin-bottom: 0.75rem;
     }
 }

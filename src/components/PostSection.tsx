@@ -10,12 +10,24 @@ interface Props {
     onSelectCandidate: (candidateId: string) => void;
 }
 
+/** Sort candidates so NOTA (None Of The Above) is always last. */
+function candidatesWithNotaLast<T extends { name: string }>(candidates: T[]): T[] {
+    return [...candidates].sort((a, b) => {
+        const aIsNota = a.name.trim().toUpperCase() === 'NOTA';
+        const bIsNota = b.name.trim().toUpperCase() === 'NOTA';
+        if (aIsNota && !bIsNota) return 1;
+        if (!aIsNota && bIsNota) return -1;
+        return 0;
+    });
+}
+
 export default function PostSection({ post, selectedCandidateId, onSelectCandidate }: Props) {
+    const orderedCandidates = candidatesWithNotaLast(post.candidates);
     return (
         <div className={styles.section}>
             <h2 className={styles.title}>Post: {post.title}</h2>
             <div className={styles.grid}>
-                {post.candidates.map((candidate) => (
+                {orderedCandidates.map((candidate) => (
                     <CandidateCard
                         key={candidate.id}
                         candidate={candidate}
